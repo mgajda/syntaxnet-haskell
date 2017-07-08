@@ -1,0 +1,1 @@
+Could you write the ADT structure that you would use in this case to provide record of both syntax tree, part of speech tagging, and referential expression tagging?

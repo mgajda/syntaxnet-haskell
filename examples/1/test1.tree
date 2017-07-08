@@ -1,0 +1,30 @@
+write VB ROOT
+ +-- Could MD aux
+ +-- you PRP nsubj
+ +-- structure NN dobj
+ |   +-- the DT det
+ |   +-- ADT NNP nn
+ |   +-- use VB rcmod
+ |       +-- that IN dobj
+ |       +-- you PRP nsubj
+ |       +-- would MD aux
+ |       +-- in IN prep
+ |       |   +-- case NN pobj
+ |       |       +-- this DT det
+ |       +-- provide VB xcomp
+ |           +-- to TO aux
+ |           +-- record NN dobj
+ |               +-- of IN prep
+ |                   +-- tree NN pobj
+ |                       +-- both DT det
+ |                       +-- syntax NN nn
+ |                       +-- , , punct
+ |                       +-- part NN conj
+ |                       |   +-- of IN prep
+ |                       |       +-- tagging NN pobj
+ |                       |           +-- speech NN nn
+ |                       +-- and CC cc
+ |                       +-- tagging VBG conj
+ |                           +-- expression NN nn
+ |                               +-- referential JJ amod
+ +-- ? . punct
