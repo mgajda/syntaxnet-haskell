@@ -2,6 +2,8 @@
 There are quite a few remarks on how to use SyntaxNet output on StackOverflow:
 https://stackoverflow.com/questions/37875614/how-to-use-syntaxnet-output
 
+One may also consider another SyntaxNet wrapper as a reference:
+https://medium.com/blog-bigdatext/open-sourcing-our-syntaxnet-wrappper-f9bb7baf0e7d
 
 ## Steps to obtain parsable files from SyntaxNet CLI:
 1. Copy `demo.sh` script to `run.sh`, and remove last step in the pipeline.
