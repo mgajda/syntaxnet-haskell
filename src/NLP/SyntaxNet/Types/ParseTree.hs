@@ -1,3 +1,6 @@
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveAnyClass    #-}
+
 module NLP.SyntaxNet.Types.ParseTree where
 
 import Data.Text

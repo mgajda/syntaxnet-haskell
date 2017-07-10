@@ -1,5 +1,10 @@
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE RecordWildCards     #-}
+
 module NLP.SyntaxNet.SyntaxNet
     ( readCnll
+    , readCnll'
     ) where
 
 import           Control.Applicative
@@ -18,6 +23,7 @@ import           Data.Csv ( DefaultOrdered (headerOrder)
                           , FromField (parseField)
                           , FromNamedRecord (parseNamedRecord)
                           , Header
+                          , HasHeader(..)
                           , ToField (toField)
                           , ToNamedRecord (toNamedRecord)
                           , (.:)
@@ -36,7 +42,25 @@ import           NLP.SyntaxNet.Types.ParseTree
 --------------------------------------------------------------------------------
 
 readCnll :: FilePath -> IO [CnllEntry]
-readCnll fpath = do
+readCnll fpath = do 
+  csvData <- BSL.readFile fpath 
+  case TEL.decodeUtf8' csvData of
+    Left  err  -> do
+      putStrLn $"error decoding" ++ (show err) -- $ Left $ show err
+      return []
+    Right dat  -> do
+      let decodingResult = (Csv.decode NoHeader $ TEL.encodeUtf8 dat) :: Either String (V.Vector CnllEntry)
+      case decodingResult of
+        Left err  -> do
+          putStrLn $ "error decoding" ++ (show err)
+          return [] -- $ Left err
+        Right vals ->   
+          return $ V.toList vals
+
+-- | Reader for Named files with header
+-- 
+readCnll' :: FilePath -> IO [CnllEntry]
+readCnll' fpath = do
   csvData <- BSL.readFile fpath 
   case TEL.decodeUtf8' csvData of
     Left  err  -> do

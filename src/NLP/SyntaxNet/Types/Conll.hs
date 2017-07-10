@@ -1,9 +1,13 @@
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE DeriveAnyClass    #-}
+
 module NLP.SyntaxNet.Types.Conll where
 
 import           Data.Text
 import           Data.Default
 import qualified Data.Csv as Csv
-                          
+import           GHC.Generics                          
                  
 --------------------------------------------------------------------------------
 
@@ -22,11 +26,10 @@ data CnllEntry =
     , cnRel       :: Text -- ^ grammatical relationships between different words in the sentence, alined with Head
     , cnHeadProj  :: Text -- ^ Projective head of current token.
     , cnRelProj   :: Text -- ^ Dependency relation to the PHEAD.     
-    } deriving (Show, Eq)
+    } deriving (Show, Eq, Generic)
 
--- TODO: 1. Add Cassava based reader 
---       2. 
 
+instance Csv.FromRecord CnllEntry
 
 -- | TODO: Check if SyntaxTree can generate named output
 --   where
