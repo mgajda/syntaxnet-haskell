@@ -1,8 +1,10 @@
 module NLP.SyntaxNet.Types.Conll where
 
-import Data.Text
-import Data.Default
-
+import           Data.Text
+import           Data.Default
+import qualified Data.Csv as Csv
+                          
+                 
 --------------------------------------------------------------------------------
 
 -- | Row entry containing row structure for CONLL
@@ -24,3 +26,20 @@ data CnllEntry =
 
 -- TODO: 1. Add Cassava based reader 
 --       2. 
+
+
+-- | TODO: Check if SyntaxTree can generate named output
+--   where
+instance Csv.FromNamedRecord CnllEntry where
+  parseNamedRecord m =
+    CnllEntry
+      <$> m Csv..: "param1"
+      <*> m Csv..: "param2"
+      <*> m Csv..: "param3"
+      <*> m Csv..: "param4"
+      <*> m Csv..: "param5"
+      <*> m Csv..: "param6"
+      <*> m Csv..: "param7"
+      <*> m Csv..: "param8"
+      <*> m Csv..: "param9"
+      <*> m Csv..: "param10"
