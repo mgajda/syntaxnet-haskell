@@ -14,6 +14,7 @@ import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Aeson
+import           Data.Char
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BSC
 import qualified Data.ByteString.Lazy as BL
@@ -28,6 +29,7 @@ import           Data.Csv ( DefaultOrdered (headerOrder)
                           , ToNamedRecord (toNamedRecord)
                           , (.:)
                           , (.=)
+                          , DecodeOptions(..)
                           )
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
@@ -49,7 +51,7 @@ readCnll fpath = do
       putStrLn $"error decoding" ++ (show err) -- $ Left $ show err
       return []
     Right dat  -> do
-      let decodingResult = (Csv.decode NoHeader $ TEL.encodeUtf8 dat) :: Either String (V.Vector CnllEntry)
+      let decodingResult = (Csv.decodeWith cnllOptions NoHeader $ TEL.encodeUtf8 dat) :: Either String (V.Vector CnllEntry)
       case decodingResult of
         Left err  -> do
           putStrLn $ "error decoding" ++ (show err)
@@ -93,3 +95,9 @@ escaper c
   | c == '\n' = "\"\n\""
   | c == '\"' = "\"\""
   | otherwise = TL.singleton c
+
+-- | Define custom options to read tab-delimeted files
+cnllOptions =
+  Csv.defaultDecodeOptions
+    { decDelimiter = fromIntegral (ord '\t')
+    }
