@@ -16,6 +16,8 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     NLP.SyntaxNet.SyntaxNet
+  other-modules:       NLP.SyntaxNet.Types.ParseTree
+                     , NLP.SyntaxNet.Types.Conll
   build-depends:       base >= 4.7 && < 5
                      , bytestring
                      , aeson

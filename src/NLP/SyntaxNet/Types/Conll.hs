@@ -1,4 +1,4 @@
-module NLP.SyntaxNet.Types.ParseTree where
+module NLP.SyntaxNet.Types.Conll where
 
 import Data.Text
 import Data.Default
