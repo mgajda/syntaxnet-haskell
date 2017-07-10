@@ -11,7 +11,7 @@ This API allows:
 2. Easy manipulation of the parse trees with extra information (given by POS and/or reference assignment.)
 
 # Tests
-Examples of parsed [SyntaxNet inputs](examples/) are attached.
+Examples of parsed [SyntaxNet inputs](test/examples/) are attached.
 
 There are following files there for each test:
 * `.txt` file contains the input
