@@ -15,6 +15,7 @@ import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Aeson
 import           Data.Char
+import           Data.Tree
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BSC
 import qualified Data.ByteString.Lazy as BL
@@ -101,3 +102,15 @@ cnllOptions =
   Csv.defaultDecodeOptions
     { decDelimiter = fromIntegral (ord '\t')
     }
+
+--------------------------------------------------------------------------------
+-- Dealing with trees
+
+readParseTree :: FilePath -> IO (Maybe (Tree TreeNode))
+readParseTree fpath = do
+  treeData <- BSC.readFile fpath
+  let ls = BSC.lines treeData
+  putStrLn $ show $ ls
+  -- TODO: 1. parse each line
+  --       2. 
+  return $ Nothing

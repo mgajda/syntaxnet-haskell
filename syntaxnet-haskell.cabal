@@ -27,6 +27,7 @@ library
                      , text-format
                      , data-default
                      , cassava
+                     , containers
   default-extensions:  OverloadedStrings
                      , TemplateHaskell
   other-extensions:    ScopedTypeVariables
