@@ -110,28 +110,27 @@ readParseTree :: FilePath -> IO (Maybe (Tree TreeNode))
 readParseTree fpath = do
   treeData <- BSC.readFile fpath
   let ls = BSC.lines treeData
-  mapM_ (putStrLn . show ) ls
-  -- TODO: 1. read file
-  --       2. split in line
-  --       3. split each line by space
+
+  -- mapM_ (putStrLn . show ) ls
+
   let lls  = map ( \x -> filter (/="") $ BSC.split ' ' x) ls
       lln  = map parseNode lls
       tree = buildTree lln 
         
-  mapM_ (putStrLn . show ) lln
+  -- mapM_ (putStrLn . show ) lln
   
   return $ Nothing
 
 parseNode :: [BSC.ByteString] -> TreeNode
 parseNode llbs = do
-  let lls = map (T.pack . BSC.unpack) llbs
-  let level  = (length lls) - 3 -- 3 is not magic number, it's labels
+  let lls  = map (T.pack . BSC.unpack) llbs
+  let lvl  = (length lls) - 3 -- 3 is not magic number, it's labels
       lbls = drop ((length lls) - 3) lls      
-  TreeNode (lbls!!0)
-           (lbls!!1)
-           (lbls!!2)
-           level    
+  TreeNode lvl    
+           (lbls!!0)
+           (parsePosCf $ T.unpack $ lbls!!1)
+           (parsePosFg $ T.unpack $ lbls!!2)
     
 buildTree :: [TreeNode] -> Tree TreeNode
-buildTree nodes = do
+buildTree nodes = undefined
   
