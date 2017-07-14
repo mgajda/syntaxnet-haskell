@@ -39,12 +39,12 @@ import qualified Data.Text.Lazy.Encoding as TEL
 import qualified Data.Csv as Csv
 import qualified Data.Vector as V
 
-import           NLP.SyntaxNet.Types.Conll
+import           NLP.SyntaxNet.Types.CoNLL
 import           NLP.SyntaxNet.Types.ParseTree
 
 --------------------------------------------------------------------------------
 
-readCnll :: FilePath -> IO [CnllEntry]
+readCnll :: FilePath -> IO [CoNLLEntry]
 readCnll fpath = do 
   csvData <- BSL.readFile fpath 
   case TEL.decodeUtf8' csvData of
@@ -52,7 +52,7 @@ readCnll fpath = do
       putStrLn $ "error decoding" ++ (show err)
       return []
     Right dat  -> do
-      let decodingResult = (Csv.decodeWith cnllOptions NoHeader $ TEL.encodeUtf8 dat) :: Either String (V.Vector CnllEntry)
+      let decodingResult = (Csv.decodeWith cnllOptions NoHeader $ TEL.encodeUtf8 dat) :: Either String (V.Vector CoNLLEntry)
       case decodingResult of
         Left err  -> do
           putStrLn $ "error decoding" ++ (show err)
@@ -62,7 +62,7 @@ readCnll fpath = do
 
 -- | Reader for Named files with header
 -- 
-readCnll' :: FilePath -> IO [CnllEntry]
+readCnll' :: FilePath -> IO [CoNLLEntry]
 readCnll' fpath = do
   csvData <- BSL.readFile fpath 
   case TEL.decodeUtf8' csvData of
@@ -80,10 +80,10 @@ readCnll' fpath = do
           return $ V.toList vals
 
           
-decodeEntries :: BL.ByteString -> Either String (V.Vector CnllEntry)
+decodeEntries :: BL.ByteString -> Either String (V.Vector CoNLLEntry)
 decodeEntries = fmap snd . Csv.decodeByName
 
-decodeEntries' :: BL.ByteString -> Either String (V.Vector CnllEntry)
+decodeEntries' :: BL.ByteString -> Either String (V.Vector CoNLLEntry)
 decodeEntries' = fmap snd . Csv.decodeByName
 
 preprocess :: TL.Text -> TL.Text

@@ -2,7 +2,7 @@
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE DeriveAnyClass    #-}
 
-module NLP.SyntaxNet.Types.Conll where
+module NLP.SyntaxNet.Types.CoNLL where
 
 import           Data.Char (toUpper)
 import qualified Data.ByteString       as BS
@@ -17,8 +17,8 @@ import           GHC.Generics
 -- | Row entry containing row structure for CONLL
 --   all relevant description can be fined at
 --   https://github.com/tensorflow/models/blob/7d30a017fe50b648be6dee544f8059bde52db562/syntaxnet/syntaxnet/text_formats.cc#L62
-data CnllEntry =
-  CnllEntry
+data CoNLLEntry =
+  CoNLLEntry
     { cnId        :: T.Text  -- ^ Index number
     , cnWord      :: T.Text  -- ^ Parsed word or punctuation symbol
     , cnLemma     :: T.Text  -- ^ Lemma or stem
@@ -52,20 +52,20 @@ data PosCg =
 
 -- | Sum type for fine-grained part-of-speech
 data PosFg = 
-    CC	 -- Coordinating conjunction
-  | CD	 -- Cardinal number
-  | DT	 -- Determiner
-  | EX	 -- Existential there
-  | FW	 -- Foreign word
-  | IN	 -- Preposition or subordinating conjunction
-  | JJ	 -- Adjective
-  | JJR	 -- Adjective, comparative
-  | JJS	 -- Adjective, superlative
-  | LS	 -- List item marker
-  | MD	 -- Modal
-  | NN	 -- Noun, singular or mass
-  | NNS	 -- Noun, plural
-  | NNP	 -- Proper noun, singular
+    CC   -- Coordinating conjunction
+  | CD   -- Cardinal number
+  | DT   -- Determiner
+  | EX   -- Existential there
+  | FW   -- Foreign word
+  | IN   -- Preposition or subordinating conjunction
+  | JJ   -- Adjective
+  | JJR  -- Adjective, comparative
+  | JJS  -- Adjective, superlative
+  | LS   -- List item marker
+  | MD   -- Modal
+  | NN   -- Noun, singular or mass
+  | NNS  -- Noun, plural
+  | NNP  -- Proper noun, singular
   | NNPS -- Proper noun, plural
   | PDT  -- Predeterminer
   | POS  -- Possessive ending
@@ -90,9 +90,9 @@ data PosFg =
   | WRB  -- Wh-adverb  
   deriving (Show, Eq, Generic)
 
-instance Csv.FromRecord CnllEntry where 
+instance Csv.FromRecord CoNLLEntry where 
   parseRecord v =
-    CnllEntry
+    CoNLLEntry
       <$> v .! 0
       <*> v .! 1
       <*> v .! 2
@@ -129,9 +129,9 @@ parsePosFg s =
       
 -- | TODO: Check if SyntaxTree can generate named output
 --   where
-instance Csv.FromNamedRecord CnllEntry where
+instance Csv.FromNamedRecord CoNLLEntry where
   parseNamedRecord m =
-    CnllEntry
+    CoNLLEntry
       <$> m Csv..: "param1"
       <*> m Csv..: "param2"
       <*> m Csv..: "param3"

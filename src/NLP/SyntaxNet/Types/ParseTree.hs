@@ -7,7 +7,7 @@ import Data.Text
 import Data.Tree
 import Data.Default
 
-import NLP.SyntaxNet.Types.Conll
+import NLP.SyntaxNet.Types.CoNLL
 
 --------------------------------------------------------------------------------
 
