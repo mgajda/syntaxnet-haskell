@@ -129,9 +129,17 @@ data DEP =
   | Nmod
   | NmodNpmod
   | NmodPoss
+  | NmodTmod
   | Nsubj
+  | NsubjPass
+  | Nummod
+  | Orphan
+  | Parataxis
   | Punct
+  | Reparandum
   | ROOT
+  | Vocative
+  | XComp
 deriving(Show, Eq, Generic)
 
 instance Csv.FromRecord CoNLLEntry where 
