@@ -17,18 +17,19 @@ import           GHC.Generics
 -- | Row entry containing row structure for CONLL
 --   all relevant description can be fined at
 --   https://github.com/tensorflow/models/blob/7d30a017fe50b648be6dee544f8059bde52db562/syntaxnet/syntaxnet/text_formats.cc#L62
-data CoNLLEntry =
-  CoNLLEntry
-    { cnId        :: T.Text  -- ^ Index number
-    , cnWord      :: T.Text  -- ^ Parsed word or punctuation symbol
-    , cnLemma     :: T.Text  -- ^ Lemma or stem
-    , cnPosCG     :: PosCG   -- ^ Part-of-Speech (POS) coarse-grained (PRON, VERB, DET, NOUN, etc) 
-    , cnPosFG     :: PosFG   -- ^ Part-of-Speech (POS) fine-grained   (PRP, VBD, DT, NN etc.) 
-    , cnFeats     :: T.Text  -- ^ Unordered set of syntactic and/or morphological features.
-    , cnHead      :: Int     -- ^ Head of the current token, which is either a value of ID or '0'.
-    , cnRel       :: GER     -- ^ grammatical relationships between different words in the sentence, alined with Head
-    , cnHeadProj  :: T.Text  -- ^ Projective head of current token.
-    , cnRelProj   :: T.Text  -- ^ Dependency relation to the PHEAD.     
+--   NB: can be renamed to Token/Entry/Word/  
+data Token =
+  Token
+    { tnId        :: Int     -- ^ Index number
+    , tnWord      :: T.Text  -- ^ Parsed word or punctuation symbol
+    , tnLemma     :: T.Text  -- ^ Lemma or stem
+    , tnPosCG     :: PosCG   -- ^ Part-of-Speech (POS) coarse-grained (PRON, VERB, DET, NOUN, etc) 
+    , tnPosFG     :: PosFG   -- ^ Part-of-Speech (POS) fine-grained   (PRP, VBD, DT, NN etc.) 
+    , tnFeats     :: T.Text  -- ^ Unordered set of syntactic and/or morphological features.
+    , tnHead      :: Int     -- ^ Head of the current token, which is either a value of ID or '0'.
+    , tnRel       :: GER     -- ^ grammatical relationships between different words in the sentence, alined with Head
+    , tnHeadProj  :: T.Text  -- ^ Projective head of current token.
+    , tnRelProj   :: T.Text  -- ^ Dependency relation to the PHEAD.     
     } deriving (Show, Eq, Generic)
 
 
@@ -50,7 +51,7 @@ data PosCG =
   | PUNCT  -- punctuation
   deriving (Show, Eq, Generic)
 
--- | Sum type for fine-grained part-of-speech
+-- | Sum type for fine-grained part-of-speech (pos)
 data PosFG = 
     CC   -- Coordinating conjunction
   | CD   -- Cardinal number
@@ -143,15 +144,16 @@ data GER =
   | ROOT
   | Vocative
   | XComp
+  | Unk           -- unknown
   deriving (Show, Eq, Generic)
 
 --------------------------------------------------------------------------------
         
 -- | TODO: Check if SyntaxTree can generate named output
 --   where
-instance Csv.FromNamedRecord CoNLLEntry where
+instance Csv.FromNamedRecord Token where
   parseNamedRecord m =
-    CoNLLEntry
+    Token
       <$> m Csv..: "param1"
       <*> m Csv..: "param2"
       <*> m Csv..: "param3"
@@ -163,9 +165,9 @@ instance Csv.FromNamedRecord CoNLLEntry where
       <*> m Csv..: "param9"
       <*> m Csv..: "param10"
 
-instance Csv.FromRecord CoNLLEntry where 
+instance Csv.FromRecord Token where 
   parseRecord v =
-    CoNLLEntry
+    Token
       <$> v .! 0
       <*> v .! 1
       <*> v .! 2

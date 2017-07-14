@@ -4,20 +4,27 @@
 module NLP.SyntaxNet.Types.ParseTree where
 
 import Data.Text
+import Control.Lens
 import Data.Tree
+import Data.Tree.Lens
 import Data.Default
 
 import NLP.SyntaxNet.Types.CoNLL
 
 --------------------------------------------------------------------------------
 
--- | Single Node, containing parse word, its tag and label
+-- | Convert list of nodes with defined level
+--   into Tree structure
+fromList :: [Token] -> Maybe (Tree Token)
+fromList nodes =
+  Just $ fromListAux nodes 0
+    where fromListAux :: [Token] -> Int -> (Tree Token)
+          fromListAux = undefined
+          
+-- | Convert Tree structure to a sequantial list structure
 -- 
-data TreeNode =
-  TreeNode
-    { tnLevel  :: Int    -- ^ parsed word level
-    , tnWord   :: Text   -- ^ parsed word
-    , tnPosCG  :: PosCG  -- ^ Part-of-Speech (POS) coarse-grained (PRON, VERB, DET, NOUN, etc)
-    , tnPosFG  :: PosFG  -- ^ Part-of-Speech (POS) fine-grained   (PRP, VBD, DT, NN etc.) 
-    } deriving (Eq, Show)
-
+toList :: Tree Token -> [Token]
+toList t =
+  toListAux t []
+    where
+      toListAux (Node x ts) xs = x : Prelude.foldr toListAux xs ts

@@ -44,7 +44,7 @@ import           NLP.SyntaxNet.Types.ParseTree
 
 --------------------------------------------------------------------------------
 
-readCnll :: FilePath -> IO [CoNLLEntry]
+readCnll :: FilePath -> IO [Token]
 readCnll fpath = do 
   csvData <- BSL.readFile fpath 
   case TEL.decodeUtf8' csvData of
@@ -52,7 +52,7 @@ readCnll fpath = do
       putStrLn $ "error decoding" ++ (show err)
       return []
     Right dat  -> do
-      let decodingResult = (Csv.decodeWith cnllOptions NoHeader $ TEL.encodeUtf8 dat) :: Either String (V.Vector CoNLLEntry)
+      let decodingResult = (Csv.decodeWith cnllOptions NoHeader $ TEL.encodeUtf8 dat) :: Either String (V.Vector Token)
       case decodingResult of
         Left err  -> do
           putStrLn $ "error decoding" ++ (show err)
@@ -62,7 +62,7 @@ readCnll fpath = do
 
 -- | Reader for Named files with header
 -- 
-readCnll' :: FilePath -> IO [CoNLLEntry]
+readCnll' :: FilePath -> IO [Token]
 readCnll' fpath = do
   csvData <- BSL.readFile fpath 
   case TEL.decodeUtf8' csvData of
@@ -80,10 +80,10 @@ readCnll' fpath = do
           return $ V.toList vals
 
           
-decodeEntries :: BL.ByteString -> Either String (V.Vector CoNLLEntry)
+decodeEntries :: BL.ByteString -> Either String (V.Vector Token)
 decodeEntries = fmap snd . Csv.decodeByName
 
-decodeEntries' :: BL.ByteString -> Either String (V.Vector CoNLLEntry)
+decodeEntries' :: BL.ByteString -> Either String (V.Vector Token)
 decodeEntries' = fmap snd . Csv.decodeByName
 
 preprocess :: TL.Text -> TL.Text
@@ -106,7 +106,7 @@ cnllOptions =
 --------------------------------------------------------------------------------
 -- Dealing with trees
 
-readParseTree :: FilePath -> IO (Maybe (Tree TreeNode))
+readParseTree :: FilePath -> IO (Maybe (Tree Token))
 readParseTree fpath = do
   treeData <- BSC.readFile fpath
   let ls = BSC.lines treeData
@@ -115,22 +115,25 @@ readParseTree fpath = do
 
   let lls  = map ( \x -> filter (/="") $ BSC.split ' ' x) ls
       lln  = map parseNode lls
-      tree = buildTree lln 
+      tree = fromList lln 
         
   -- mapM_ (putStrLn . show ) lln
   
   return $ Nothing
 
-parseNode :: [BSC.ByteString] -> TreeNode
+parseNode :: [BSC.ByteString] -> Token
 parseNode llbs = do
   let lls  = map (T.pack . BSC.unpack) llbs
-  let lvl  = (length lls) - 3 -- 3 is not magic number, it's labels
+      lvl  = (length lls) - 3 -- 3 is not magic number, it's labels
       lbls = drop ((length lls) - 3) lls      
-  TreeNode lvl    
-           (lbls!!0)
-           (parsePosCf $ T.unpack $ lbls!!1)
-           (parsePosFg $ T.unpack $ lbls!!2)
-    
-buildTree :: [TreeNode] -> Maybe (Tree TreeNode)
-buildTree nodes = Nothing
-  
+
+  Token lvl       -- reuse id to indicate level, when working with trees          
+        (lbls!!0)
+        ""
+        (parsePosCf $ T.unpack $ lbls!!1)
+        (parsePosFg $ T.unpack $ lbls!!2)
+        ""
+        0
+        Unk
+        ""
+        ""
