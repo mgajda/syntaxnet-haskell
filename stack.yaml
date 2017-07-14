@@ -1,6 +1,14 @@
-resolver: lts-8.21
+resolver: lts-8.22
+
 packages:
 - '.'
-extra-deps: []
+- location:
+    git: https://sigrlami:e3fbc18969f77343c8d64130c341dc6ffaef52c0@github.com/mgajda/haskell-conll
+    commit: f3efa9dfd1567ce52eb7e4271cd047690c47c5f3
+
+extra-deps:
+  - haskell-conll-0.1.0.0
+
 flags: {}
+
 extra-package-dbs: []
