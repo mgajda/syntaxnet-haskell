@@ -22,11 +22,11 @@ data CoNLLEntry =
     { cnId        :: T.Text  -- ^ Index number
     , cnWord      :: T.Text  -- ^ Parsed word or punctuation symbol
     , cnLemma     :: T.Text  -- ^ Lemma or stem
-    , cnPosCp     :: PosCg   -- ^ Part-of-Speech (POS) coarse-grained (PRON, VERB, DET, NOUN, etc) 
-    , cnPosTag    :: PosFg   -- ^ Part-of-Speech (POS) fine-grained   (PRP, VBD, DT, NN etc.) 
+    , cnPosCG     :: PosCG   -- ^ Part-of-Speech (POS) coarse-grained (PRON, VERB, DET, NOUN, etc) 
+    , cnPosFG     :: PosFG   -- ^ Part-of-Speech (POS) fine-grained   (PRP, VBD, DT, NN etc.) 
     , cnFeats     :: T.Text  -- ^ Unordered set of syntactic and/or morphological features.
     , cnHead      :: Int     -- ^ Head of the current token, which is either a value of ID or '0'.
-    , cnRel       :: T.Text  -- ^ grammatical relationships between different words in the sentence, alined with Head
+    , cnRel       :: GER     -- ^ grammatical relationships between different words in the sentence, alined with Head
     , cnHeadProj  :: T.Text  -- ^ Projective head of current token.
     , cnRelProj   :: T.Text  -- ^ Dependency relation to the PHEAD.     
     } deriving (Show, Eq, Generic)
@@ -35,7 +35,7 @@ data CoNLLEntry =
 -- | See "A Universal Part-of-Speech Tagset" by Slav Petrov, Dipanjan Das and Ryan McDonald
 --   for more details http://arxiv.org/abs/1104.2086
 --   Sum type for 12 universal part-of-speech tags, coarse-grained
-data PosCg =
+data PosCG =
     VERB   -- verbs (all tenses and modes)
   | NOUN   -- nouns (common and proper)
   | PRON   -- pronouns 
@@ -51,7 +51,7 @@ data PosCg =
   deriving (Show, Eq, Generic)
 
 -- | Sum type for fine-grained part-of-speech
-data PosFg = 
+data PosFG = 
     CC   -- Coordinating conjunction
   | CD   -- Cardinal number
   | DT   -- Determiner
@@ -90,7 +90,10 @@ data PosFg =
   | WRB  -- Wh-adverb  
   deriving (Show, Eq, Generic)
 
-data DEP =
+-- | Grammatical Entity Relation (GER), also known as dependecies
+--   Currently English set http://universaldependencies.org/en/dep/all.html
+--   TODO: should be extender
+data GER =
     Acl
   | AclRelcl
   | Advcl
@@ -140,7 +143,25 @@ data DEP =
   | ROOT
   | Vocative
   | XComp
-deriving(Show, Eq, Generic)
+  deriving (Show, Eq, Generic)
+
+--------------------------------------------------------------------------------
+        
+-- | TODO: Check if SyntaxTree can generate named output
+--   where
+instance Csv.FromNamedRecord CoNLLEntry where
+  parseNamedRecord m =
+    CoNLLEntry
+      <$> m Csv..: "param1"
+      <*> m Csv..: "param2"
+      <*> m Csv..: "param3"
+      <*> ( parsePosCf <$> m Csv..: "param4")
+      <*> ( parsePosFg <$> m Csv..: "param5")
+      <*> m Csv..: "param6"
+      <*> m Csv..: "param7"
+      <*> ( parseGER   <$> m Csv..: "param8")
+      <*> m Csv..: "param9"
+      <*> m Csv..: "param10"
 
 instance Csv.FromRecord CoNLLEntry where 
   parseRecord v =
@@ -152,11 +173,13 @@ instance Csv.FromRecord CoNLLEntry where
       <*> ( parsePosFg <$> v .! 4)
       <*> v .! 5
       <*> v .! 6
-      <*> v .! 7
+      <*> ( parseGER   <$> v .! 7)
       <*> v .! 8
       <*> v .! 9
 
-parsePosCf :: String -> PosCg
+-- | Converting coarse-grained textual types int
+--   ADT representation
+parsePosCf :: String -> PosCG
 parsePosCf s =
   case (map toUpper s) of
     "VERB" -> VERB
@@ -172,25 +195,18 @@ parsePosCf s =
     "X"    -> X      
     "."    -> PUNCT      
 
+-- | Converting fine-grained textual types into
+--   ADT representation
+parsePosFg :: String -> PosFG
 parsePosFg s =
   case (map toUpper s) of
     "PRP" -> PRP
     "VBD" -> VBD
     "DT"  -> DT
     "NN"  -> NN   
-      
--- | TODO: Check if SyntaxTree can generate named output
---   where
-instance Csv.FromNamedRecord CoNLLEntry where
-  parseNamedRecord m =
-    CoNLLEntry
-      <$> m Csv..: "param1"
-      <*> m Csv..: "param2"
-      <*> m Csv..: "param3"
-      <*> ( parsePosCf <$> m Csv..: "param4")
-      <*> ( parsePosFg <$> m Csv..: "param5")
-      <*> m Csv..: "param6"
-      <*> m Csv..: "param7"
-      <*> m Csv..: "param8"
-      <*> m Csv..: "param9"
-      <*> m Csv..: "param10"
+
+parseGER :: String -> GER
+parseGER s =
+  case (map toUpper s) of
+    "DOBJ"  -> Dobj
+    "NSUBJ" -> Nsubj

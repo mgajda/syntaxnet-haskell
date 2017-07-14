@@ -17,7 +17,7 @@ data TreeNode =
   TreeNode
     { tnLevel  :: Int    -- ^ parsed word level
     , tnWord   :: Text   -- ^ parsed word
-    , tnPosCp  :: PosCg  -- ^ Part-of-Speech (POS) coarse-grained (PRON, VERB, DET, NOUN, etc)
-    , tnPosTag :: PosFg  -- ^ Part-of-Speech (POS) fine-grained   (PRP, VBD, DT, NN etc.) 
+    , tnPosCG  :: PosCG  -- ^ Part-of-Speech (POS) coarse-grained (PRON, VERB, DET, NOUN, etc)
+    , tnPosFG  :: PosFG  -- ^ Part-of-Speech (POS) fine-grained   (PRP, VBD, DT, NN etc.) 
     } deriving (Eq, Show)
 
