@@ -49,14 +49,14 @@ readCnll fpath = do
   csvData <- BSL.readFile fpath 
   case TEL.decodeUtf8' csvData of
     Left  err  -> do
-      putStrLn $"error decoding" ++ (show err) -- $ Left $ show err
+      putStrLn $ "error decoding" ++ (show err)
       return []
     Right dat  -> do
       let decodingResult = (Csv.decodeWith cnllOptions NoHeader $ TEL.encodeUtf8 dat) :: Either String (V.Vector CnllEntry)
       case decodingResult of
         Left err  -> do
           putStrLn $ "error decoding" ++ (show err)
-          return [] -- $ Left err
+          return [] 
         Right vals ->   
           return $ V.toList vals
 
@@ -67,14 +67,14 @@ readCnll' fpath = do
   csvData <- BSL.readFile fpath 
   case TEL.decodeUtf8' csvData of
     Left  err  -> do
-      putStrLn $"error decoding" ++ (show err) -- $ Left $ show err
+      putStrLn $ "error decoding" ++ (show err)
       return []
     Right dat  -> do
       let dat' = dat
       case decodeEntries $ TEL.encodeUtf8 dat' of
         Left  err  -> do
           putStrLn $ "error decoding" ++ (show err)
-          return [] -- $ Left err
+          return []
         Right vals -> do
           -- TODO: do additional operations
           return $ V.toList vals

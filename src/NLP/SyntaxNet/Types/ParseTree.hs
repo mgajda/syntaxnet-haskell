@@ -12,6 +12,7 @@ import NLP.SyntaxNet.Types.Conll
 --------------------------------------------------------------------------------
 
 -- | Single Node, containing parse word, its tag and label
+-- 
 data TreeNode =
   TreeNode
     { tnLevel  :: Int    -- ^ parsed word level

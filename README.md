@@ -1,5 +1,7 @@
 # Google's SyntaxNet API in Haskell
 
+[![Build Status](https://travis-ci.com/mgajda/syntaxnet-haskell.svg?token=DtSUtnf37TUDy1p4x6fT&branch=master)](https://travis-ci.com/mgajda/syntaxnet-haskell)
+
 Haskell library for using [Google's SyntaxNet](https://github.com/tensorflow/models/tree/master/syntaxnet).
 SyntaxNet is natural language parser including:
 * Part of Speech tagger,
