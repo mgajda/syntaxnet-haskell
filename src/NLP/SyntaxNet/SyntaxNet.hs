@@ -131,6 +131,6 @@ parseNode llbs = do
            (parsePosCf $ T.unpack $ lbls!!1)
            (parsePosFg $ T.unpack $ lbls!!2)
     
-buildTree :: [TreeNode] -> Tree TreeNode
-buildTree nodes = undefined
+buildTree :: [TreeNode] -> Maybe (Tree TreeNode)
+buildTree nodes = Nothing
   
