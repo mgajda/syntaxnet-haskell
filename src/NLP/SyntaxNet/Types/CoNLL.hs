@@ -90,6 +90,50 @@ data PosFg =
   | WRB  -- Wh-adverb  
   deriving (Show, Eq, Generic)
 
+data DEP =
+    Acl
+  | AclRelcl
+  | Advcl
+  | Advmod
+  | Amod
+  | Appos
+  | Aux
+  | AuxPass
+  | Case
+  | Cc
+  | CCCoord
+  | CCPreconj
+  | CComp
+  | Compound
+  | CompoundPrt
+  | Conj
+  | Cop
+  | Csubj
+  | CsubjPass
+  | Dep
+  | Det
+  | DetPredet
+  | Discourse
+  | Discolated 
+  | Dobj
+  | Exmpl
+  | Fixed
+  | FixedNot
+  | Flat
+  | Foreign
+  | GoesWith
+  | IObj
+  | List
+  | Mark
+  | Neg
+  | Nmod
+  | NmodNpmod
+  | NmodPoss
+  | Nsubj
+  | Punct
+  | ROOT
+deriving(Show, Eq, Generic)
+
 instance Csv.FromRecord CoNLLEntry where 
   parseRecord v =
     CoNLLEntry

@@ -8,9 +8,9 @@ Modern NLP libraries tend to standardatization of core types and values used in 
 1) Part-of-Speech(POS) tags can be of 2 types - Coarse-Grained, Fine-Grained, 
 - Coarse-grained used for rought identification .universal set initially presented in the paper http://www.petrovi.de/data/lrec.pdf
 - Fine-grained used for describing more precise pos of particular token
-- NER for word relationships (dobj, etc.
+- ER(entity relationship) for word grammatical relationships (dobj, noun, etc.) https://nlp.stanford.edu/software/dependencies_manual.pdf
 
-Now, there is wide adoption within scientific community for universal things. Look at http://universaldependencies.org/
+Now, there is wide adoption within scientific community for universal things. Look at http://universaldependencies.org/, http://universaldependencies.org/en/dep/all.html for ER
 
 Both of those can be represented as sum type like this:
 
