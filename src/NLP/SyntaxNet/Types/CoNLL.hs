@@ -147,31 +147,28 @@ data GER =
   | Vocative
   | XComp
   | UnkGer           -- unknown
-  deriving ( Eq, Generic)
+  deriving (Show, Eq, Generic)
 
-instance Show GER where
-  show v =
-    case v of
-      UnkGer    -> "unknown"
-      otherwise ->
-        intercalate ":" $ splitR isUpper $ toString $ shows v
-        where
-          splitR :: (Char -> Bool) -> String -> [String]
-          splitR _ [] = []
-          splitR p s =
-            let
-              go :: Char -> String -> [String]
-              go m s' = case break p s' of
-                (b', [])     -> [ m:b' ]
-                (b', (x:xs)) -> ( m:b' ) : go x xs
-            in case break p s of
-              (b,  [])    -> [ b ]
-              ([], (h:t)) -> go h t
-              (b, (h:t))  -> b : go h t
-
-          toString :: ShowS -> String
-          toString = ($ [])
-   
+showPP :: GER -> String
+showPP v = 
+  case v of
+    UnkGer    -> "unknown"
+    otherwise ->
+      intercalate ":" $ splitR isUpper $ show v
+      where
+        splitR :: (Char -> Bool) -> String -> [String]
+        splitR _ [] = []
+        splitR p s =
+          let
+            go :: Char -> String -> [String]
+            go m s' = case break p s' of
+              (b', [])     -> [ m:b' ]
+              (b', (x:xs)) -> ( m:b' ) : go x xs
+          in case break p s of
+            (b,  [])    -> [ b ]
+            ([], (h:t)) -> go h t
+            (b, (h:t))  -> b : go h t
+  
               
 
 --------------------------------------------------------------------------------
