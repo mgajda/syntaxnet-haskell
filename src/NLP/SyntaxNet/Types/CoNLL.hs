@@ -49,6 +49,7 @@ data PosCG =
   | PRT    -- particles or other function words
   | X      -- other: foreign words, typos, abbreviations
   | PUNCT  -- punctuation
+  | UnkCg  -- unknown
   deriving (Show, Eq, Generic)
 
 -- | Sum type for fine-grained part-of-speech (pos)
@@ -88,7 +89,8 @@ data PosFG =
   | WDT  -- Wh-determiner
   | WP   -- Wh-pronoun
   | WPS  -- Possessive wh-pronoun WP$
-  | WRB  -- Wh-adverb  
+  | WRB  -- Wh-adverb
+  | UnkFg
   deriving (Show, Eq, Generic)
 
 -- | Grammatical Entity Relation (GER), also known as dependecies
@@ -144,7 +146,7 @@ data GER =
   | ROOT
   | Vocative
   | XComp
-  | Unk           -- unknown
+  | UnkGer           -- unknown
   deriving (Show, Eq, Generic)
 
 --------------------------------------------------------------------------------
@@ -196,7 +198,8 @@ parsePosCf s =
     "PRT"  -> PRT    
     "X"    -> X      
     "."    -> PUNCT      
-
+    otherwise -> UnkCg
+    
 -- | Converting fine-grained textual types into
 --   ADT representation
 parsePosFg :: String -> PosFG
@@ -206,9 +209,11 @@ parsePosFg s =
     "VBD" -> VBD
     "DT"  -> DT
     "NN"  -> NN   
-
+    otherwise -> UnkFg
+    
 parseGER :: String -> GER
 parseGER s =
   case (map toUpper s) of
     "DOBJ"  -> Dobj
     "NSUBJ" -> Nsubj
+    otherwise -> UnkGer

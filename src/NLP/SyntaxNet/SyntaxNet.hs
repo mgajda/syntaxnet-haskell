@@ -16,6 +16,7 @@ import           Control.Monad.IO.Class
 import           Data.Aeson
 import           Data.Char
 import           Data.Tree
+import           Data.Maybe
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BSC
 import qualified Data.ByteString.Lazy as BL
@@ -111,13 +112,13 @@ readParseTree fpath = do
   treeData <- BSC.readFile fpath
   let ls = BSC.lines treeData
 
-  -- mapM_ (putStrLn . show ) ls
+  mapM_ (putStrLn . show ) ls
 
   let lls  = map ( \x -> filter (/="") $ BSC.split ' ' x) ls
       lln  = map parseNode lls
       tree = fromList lln 
         
-  -- mapM_ (putStrLn . show ) lln
+  mapM_ (putStrLn . show ) lln
   
   return $ Nothing
 
@@ -134,6 +135,6 @@ parseNode llbs = do
         (parsePosFg $ T.unpack $ lbls!!2)
         ""
         0
-        Unk
+        UnkGer
         ""
         ""
