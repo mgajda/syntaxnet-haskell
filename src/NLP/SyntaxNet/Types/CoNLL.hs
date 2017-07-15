@@ -4,10 +4,11 @@
 
 module NLP.SyntaxNet.Types.CoNLL where
 
-import           Data.Char (toUpper)
+import           Data.Char (toUpper, isUpper)
 import qualified Data.ByteString       as BS
 import qualified Data.ByteString.Char8 as BSC
 import qualified Data.Text             as T
+import           Data.List
 import           Data.Default
 import           Data.Csv              as Csv
 import           GHC.Generics                          
@@ -104,31 +105,30 @@ data GER =
   | Amod
   | Appos
   | Aux
-  | AuxPass
+  | Auxpass
   | Case
   | Cc
-  | CCCoord
-  | CCPreconj
-  | CComp
+  | CcPreconj
+  | Ccomp
   | Compound
   | CompoundPrt
   | Conj
   | Cop
   | Csubj
-  | CsubjPass
+  | Csubjpass
   | Dep
   | Det
   | DetPredet
   | Discourse
   | Discolated 
   | Dobj
-  | Exmpl
+  | Expl
   | Fixed
   | FixedNot
   | Flat
   | Foreign
-  | GoesWith
-  | IObj
+  | Goeswith
+  | Iobj
   | List
   | Mark
   | Neg
@@ -147,7 +147,32 @@ data GER =
   | Vocative
   | XComp
   | UnkGer           -- unknown
-  deriving (Show, Eq, Generic)
+  deriving ( Eq, Generic)
+
+instance Show GER where
+  show v =
+    case v of
+      UnkGer    -> "unknown"
+      otherwise ->
+        intercalate ":" $ splitR isUpper $ toString $ shows v
+        where
+          splitR :: (Char -> Bool) -> String -> [String]
+          splitR _ [] = []
+          splitR p s =
+            let
+              go :: Char -> String -> [String]
+              go m s' = case break p s' of
+                (b', [])     -> [ m:b' ]
+                (b', (x:xs)) -> ( m:b' ) : go x xs
+            in case break p s of
+              (b,  [])    -> [ b ]
+              ([], (h:t)) -> go h t
+              (b, (h:t))  -> b : go h t
+
+          toString :: ShowS -> String
+          toString = ($ [])
+   
+              
 
 --------------------------------------------------------------------------------
         
@@ -205,15 +230,93 @@ parsePosCf s =
 parsePosFg :: String -> PosFG
 parsePosFg s =
   case (map toUpper s) of
-    "PRP" -> PRP
-    "VBD" -> VBD
+    "CC"  -> CC  
+    "CD"  -> CD
     "DT"  -> DT
-    "NN"  -> NN   
+    "EX"  -> EX
+    "FW"  -> FW
+    "IN"  -> IN
+    "JJ"  -> JJ
+    "JJR" -> JJR
+    "JJS" -> JJS
+    "LS"  -> LS
+    "MD"  -> MD
+    "NN"  -> NN
+    "NNS" -> NNS
+    "NNP" -> NNP
+    "NNPS"-> NNPS
+    "PDT" -> PDT
+    "POS" -> POS
+    "PRP" -> PRP
+    "PRPS"-> PRPS
+    "RB"  -> RB
+    "RBR" -> RBR
+    "RBS" -> RBS
+    "RP"  -> RP
+    "SYM" -> SYM
+    "TO"  -> TO
+    "UH"  -> UH
+    "VB"  -> VB
+    "VBD" -> VBD
+    "VBG" -> VBG
+    "VBN" -> VBN
+    "VBP" -> VBP
+    "VBZ" -> VBZ
+    "WDT" -> WDT
+    "WP"  -> WP
+    "WPS" -> WPS
+    "WRB" -> WRB
     otherwise -> UnkFg
     
 parseGER :: String -> GER
 parseGER s =
-  case (map toUpper s) of
-    "DOBJ"  -> Dobj
-    "NSUBJ" -> Nsubj
-    otherwise -> UnkGer
+  case s of
+    "acl"         -> Acl
+    "acl:relcl"   -> AclRelcl
+    "advck"       -> Advcl
+    "advmod"      -> Advmod
+    "amod"        -> Amod
+    "appos"       -> Appos
+    "aux"         -> Aux
+    "auxpass"     -> Auxpass
+    "case"        -> Case
+    "cc"          -> Cc
+    "cc:preconj"  -> CcPreconj
+    "ccomp"       -> Ccomp
+    "compound"    -> Compound
+    "compound:prt"-> CompoundPrt
+    "conj"        -> Conj
+    "cop"         -> Cop
+    "csubj"       -> Csubj
+    "csubjpass"   -> Csubjpass
+    "dep"         -> Dep
+    "det"         -> Det
+    "det:predet"  -> DetPredet
+    "discource"   -> Discourse
+    "discolated"  -> Discolated 
+    "dobj"        -> Dobj
+    "expl"        -> Expl
+    "fixed"       -> Fixed
+    "fixed:not"   -> FixedNot
+    "flat"        -> Flat
+    "foreign"     -> Foreign
+    "goeswith"    -> Goeswith
+    "iobj"        -> Iobj
+    "list"        -> List
+    "mark"        -> Mark
+    "neg"         -> Neg
+    "nmod"        -> Nmod
+    "nmod:npmod"  -> NmodNpmod
+    "nmod:poss"   -> NmodPoss
+    "nmod:tmod"   -> NmodTmod
+    "nsubj"       -> Nsubj
+    "nsubjpass"   -> NsubjPass
+    "nummod"      -> Nummod
+    "orphan"      -> Orphan
+    "parataxis"   -> Parataxis
+    "punct"       -> Punct
+    "reparandum"  -> Reparandum
+    "ROOT"        -> ROOT
+    "vocatile"    -> Vocative
+    "xcomp"       -> XComp
+    otherwise     -> UnkGer
