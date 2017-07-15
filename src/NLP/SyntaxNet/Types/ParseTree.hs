@@ -37,8 +37,8 @@ draw (Node tkn ts0) =
   P.lines (unpack $ tnWord tkn) ++ drawSubTrees ts0
     where
       drawSubTrees []     = []
-      drawSubTrees [t]    = "|" : shift "`- " "   " (draw t)
-      drawSubTrees (t:ts) = "|" : shift "+- " "|  " (draw t) ++ drawSubTrees ts
+      drawSubTrees [t]    = " |" : shift " +-- " "   " (draw t)
+      drawSubTrees (t:ts) = " |" : shift " +-- " " |  " (draw t) ++ drawSubTrees ts
 
       shift first other = P.zipWith (++) (first : repeat other)
 
@@ -88,6 +88,30 @@ fromList (n:nodes) =
               -- next level is higher, attach only and move forest up
               f ++ [Node t []]
               
+fromList' :: [Token] -> IO (Maybe TokenTree)
+fromList' (n:nodes) = do
+  forest <- fromListAux nodes []
+  return $ Just $ Node n forest 
+    where fromListAux :: [Token]         -- ^ List of parsed Tokens
+                      -> [Tree Token]    -- ^ Building Forest
+                      -> IO [Tree Token] -- ^ Final Forest
+          fromListAux []         f = return $ f
+          fromListAux (t:ts:tss) f
+            -- check current and next level
+            | tnId t == tnId ts      = do
+              -- next element on the same level, attach only
+              putStrLn $ "1"
+              fromListAux (ts:tss) (f ++ [Node t []])
+            | tnId t <  tnId ts      = do
+              -- attach and move recursevly deep
+              putStrLn "2"
+              sforest <- fromListAux tss []
+              fromListAux (ts:tss) (f ++ [(Node t sforest)])
+            | tnId t >  tnId ts      = do
+              -- next level is higher, attach only and move forest up
+              putStrLn $ "3"  
+              return $ f ++ [Node t []]
+
           
 -- | Convert Tree structure to a sequantial list structure
 -- 

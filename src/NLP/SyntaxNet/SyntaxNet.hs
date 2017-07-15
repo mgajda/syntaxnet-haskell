@@ -116,9 +116,12 @@ readParseTree fpath = do
 
   let lls  = map ( \x -> filter (/="") $ BSC.split ' ' x) ls
       lln  = map parseNode lls
-      tree = fromList lln 
+
+  tree <- fromList' lln 
         
   mapM_ (putStrLn . show ) lln
+  putStrLn "----\n"
+  putStrLn $ drawTree' $ fromJust tree
   
   return $ Nothing
 
