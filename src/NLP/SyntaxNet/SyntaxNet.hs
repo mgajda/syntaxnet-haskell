@@ -112,32 +112,50 @@ readParseTree fpath = do
   treeData <- BSC.readFile fpath
   let ls = BSC.lines treeData
 
+  let lls  = map ( \x -> BSC.split ' ' x) ls 
+      lln  = map parseNode lls
+
+  let tree = fromList lln 
+  
+  return $ tree
+
+-- | Same as readParseTree but for debugging
+-- 
+readParseTree' :: FilePath -> IO ()
+readParseTree' fpath = do
+  treeData <- BSC.readFile fpath
+  let ls = BSC.lines treeData
+
   mapM_ (putStrLn . show ) ls
 
-  let lls  = map ( \x -> filter (/="") $ BSC.split ' ' x) ls
+  let lls  = map ( \x -> BSC.split ' ' x) ls
       lln  = map parseNode lls
 
   tree <- fromList' lln 
-        
-  mapM_ (putStrLn . show ) lln
+
+  --mapM_ (putStrLn . show ) lln
   putStrLn "----\n"
   putStrLn $ drawTree' $ fromJust tree
   
-  return $ Nothing
-
+  return $ ()
+  
 parseNode :: [BSC.ByteString] -> Token
 parseNode llbs = do
-  let lls  = map (T.pack . BSC.unpack) llbs
-      lvl  = (length lls) - 3 -- 3 is not magic number, it's labels
-      lbls = drop ((length lls) - 3) lls      
+  let llss  =  map BSC.unpack llbs
+      lenLB = 3                             -- useful labels like TOKEN POS ER
+      lenWP = length $ filter (=="  ") llss -- each identation takes 2 spaces
 
-  Token lvl       -- reuse id to indicate level, when working with trees          
+  let lls  = map T.pack llss
+      lvl  = (length lls) - lenLB - lenWP   -- calculate actual level  
+      lbls = drop ((length lls) - 3) lls    -- extract only lables      
+
+  Token lvl                                 -- reuse id to indicate level, when working with trees          
         (lbls!!0)
         ""
-        (parsePosCf $ T.unpack $ lbls!!1)
-        (parsePosFg $ T.unpack $ lbls!!2)
+        UnkCg
+        (parsePosFg $ T.unpack $ lbls!!1)
         ""
         0
-        UnkGer
+        (parseGER $ T.unpack $ lbls!!2)
         ""
         ""

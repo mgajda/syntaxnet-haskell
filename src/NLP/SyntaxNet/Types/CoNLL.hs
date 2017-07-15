@@ -4,7 +4,7 @@
 
 module NLP.SyntaxNet.Types.CoNLL where
 
-import           Data.Char (toUpper, isUpper)
+import           Data.Char (toUpper, isUpper, toLower)
 import qualified Data.ByteString       as BS
 import qualified Data.ByteString.Char8 as BSC
 import qualified Data.Text             as T
@@ -143,7 +143,7 @@ data GER =
   | Parataxis
   | Punct
   | Reparandum
-  | ROOT
+  | Root
   | Vocative
   | XComp
   | UnkGer           -- unknown
@@ -153,8 +153,9 @@ showPP :: GER -> String
 showPP v = 
   case v of
     UnkGer    -> "unknown"
+    Root      -> "ROOT"
     otherwise ->
-      intercalate ":" $ splitR isUpper $ show v
+      map toLower $ intercalate ":" $ splitR isUpper $ show v
       where
         splitR :: (Char -> Bool) -> String -> [String]
         splitR _ [] = []
@@ -313,7 +314,7 @@ parseGER s =
     "parataxis"   -> Parataxis
     "punct"       -> Punct
     "reparandum"  -> Reparandum
-    "ROOT"        -> ROOT
+    "ROOT"        -> Root
     "vocatile"    -> Vocative
     "xcomp"       -> XComp
     otherwise     -> UnkGer
