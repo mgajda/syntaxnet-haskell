@@ -1,26 +1,27 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE DeriveAnyClass    #-}
+{-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE DeriveGeneric        #-}
+{-# LANGUAGE DeriveAnyClass       #-}
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE FlexibleInstances    #-}
 
 module NLP.SyntaxNet.Types.CoNLL where
 
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BSC
 import           Data.Char (toUpper, isUpper, toLower)
-import           Data.ConllToken (ConllToken(..), SyntaxErrorCoNLL(..))
 import           Data.Csv as Csv
 import           Data.Default
---import           Data.List
 import           Protolude
 import           Data.List.Split
-import           Data.SyntaxTree (SyntaxtTree(..), createSyntaxTree)
-import           Data.TagLabel
 import qualified Data.Text as T
 import           GHC.Generics
+
+import           Data.ConllToken (ConllToken(..), SyntaxErrorCoNLL(..))
+import           Data.SyntaxTree (SyntaxtTree(..), createSyntaxTree)
 import           Model.PennTreebank
 import           Model.UniversalTreebank
-import           Protolude
-                 
+import           Data.TagLabel
+
 --------------------------------------------------------------------------------
 
 type SnConllToken a = ConllToken  PosCG POS REL T.Text a
@@ -47,147 +48,131 @@ data PosCG =
 
 --------------------------------------------------------------------------------
         
--- | TODO: Check if SyntaxTree can generate named output
---   where
-instance Csv.FromNamedRecord SnConllToken where
-  parseNamedRecord m =
-    SnConllToken
-      <$> m Csv..: "param1"
-      <*> m Csv..: "param2"
-      <*> m Csv..: "param3"
-      <*> ( parsePosCf <$> m Csv..: "param4")
-      <*> ( parsePosFg <$> m Csv..: "param5")
-      <*> m Csv..: "param6"
-      <*> m Csv..: "param7"
-      <*> ( parseGER   <$> m Csv..: "param8")
-      <*> m Csv..: "param9"
-      <*> m Csv..: "param10"
-
-instance Csv.FromRecord SnConllToken where 
-  parseRecord v =
-    SnConllToken
-      <$> v .! 0
-      <*> v .! 1
-      <*> v .! 2
-      <*> ( parsePosCf <$> v .! 3)
-      <*> ( parsePosFg <$> v .! 4)
-      <*> v .! 5
-      <*> v .! 6
-      <*> ( parseGER   <$> v .! 7)
-      <*> v .! 8
-      <*> v .! 9
-
--- -- | Converting coarse-grained textual types int
--- --   ADT representation
--- parsePosCf :: String -> PosCG
--- parsePosCf s =
---   case (map toUpper s) of
---     "VERB" -> VERB
---     "NOUN" -> NOUN
---     "PRON" -> PRON
---     "ADJ"  -> ADJ
---     "ADV"  -> ADV
---     "ADP"  -> ADP    
---     "CONJ" -> CONJ   
---     "DET"  -> DET    
---     "NUM"  -> NUM    
---     "PRT"  -> PRT    
---     "X"    -> X      
---     "."    -> PUNCT      
---     otherwise -> UnkCg
+instance Csv.FromRecord (SnConllToken T.Text) where 
+  parseRecord v = do
+    a0 <- v .! 0
+    a1 <- v .! 1
+    a2 <- v .! 2
+    a3 <- ( parsePosCf <$> v .! 3)
+    a4 <- ( parsePosFg <$> v .! 4)
+    a5 <- v .! 5
+    a6 <- v .! 6
+    a7 <- ( parseGER   <$> v .! 7)
+    a8 <- v .! 8
+    a9 <- v .! 9
+    return (ConllToken a0 a1 a2 a3 a4 a5 a6 a7 a8 a9)
+         
+-- | Converting coarse-grained textual types int
+--   ADT representation
+parsePosCf :: T.Text -> PosCG
+parsePosCf s =
+  case (map toUpper $ T.unpack s) of
+    "VERB" -> VERB
+    "NOUN" -> NOUN
+    "PRON" -> PRON
+    "ADJ"  -> ADJ
+    "ADV"  -> ADV
+    "ADP"  -> ADP    
+    "CONJ" -> CONJ   
+    "DET"  -> DET    
+    "NUM"  -> NUM    
+    "PRT"  -> PRT    
+    "X"    -> X      
+    "."    -> PUNCT      
+    otherwise -> UnkCg
     
--- -- | Converting fine-grained textual types into
--- --   ADT representation
--- parsePosFg :: String -> PosFG
--- parsePosFg s =
---   case (map toUpper s) of
---     "CC"  -> CC  
---     "CD"  -> CD
---     "DT"  -> DT
---     "EX"  -> EX
---     "FW"  -> FW
---     "IN"  -> IN
---     "JJ"  -> JJ
---     "JJR" -> JJR
---     "JJS" -> JJS
---     "LS"  -> LS
---     "MD"  -> MD
---     "NN"  -> NN
---     "NNS" -> NNS
---     "NNP" -> NNP
---     "NNPS"-> NNPS
---     "PDT" -> PDT
---     "POS" -> POS
---     "PRP" -> PRP
---     "PRPS"-> PRPS
---     "RB"  -> RB
---     "RBR" -> RBR
---     "RBS" -> RBS
---     "RP"  -> RP
---     "SYM" -> SYM
---     "TO"  -> TO
---     "UH"  -> UH
---     "VB"  -> VB
---     "VBD" -> VBD
---     "VBG" -> VBG
---     "VBN" -> VBN
---     "VBP" -> VBP
---     "VBZ" -> VBZ
---     "WDT" -> WDT
---     "WP"  -> WP
---     "WPS" -> WPS
---     "WRB" -> WRB
---     otherwise -> UnkFg
+-- | Converting fine-grained textual types into
+--   ADT representation
+parsePosFg :: T.Text -> POS
+parsePosFg s =
+  case (map toUpper $ T.unpack s) of
+    "CC"  -> CC  
+    "CD"  -> CD
+    "DT"  -> DT
+    "EX"  -> EX
+    "FW"  -> FW
+    "IN"  -> IN
+    "JJ"  -> JJ
+    "JJR" -> JJR
+    "JJS" -> JJS
+    "LS"  -> LS
+    "MD"  -> MD
+    "NN"  -> NN
+    "NNS" -> NNS
+    "NNP" -> NNP
+    "NNPS"-> NNPS
+    "PDT" -> PDT
+    "POS" -> POS
+    "PRP" -> PRP
+    "PRP$"-> PRP_Dollar "RPR$"
+    "RB"  -> RB
+    "RBR" -> RBR
+    "RBS" -> RBS
+    "RP"  -> RP
+    "SYM" -> SYM
+    "TO"  -> TO
+    "UH"  -> UH
+    "VB"  -> VB
+    "VBD" -> VBD
+    "VBG" -> VBG
+    "VBN" -> VBN
+    "VBP" -> VBP
+    "VBZ" -> VBZ
+    "WDT" -> WDT
+    "WP"  -> WP
+--    "WPS" -> WPS
+    "WRB" -> WRB
+--    otherwise -> UnkFg -- haskell-conll doesn't support fallback
     
--- parseGER :: String -> GER
--- parseGER s =
---   case s of
---     "acl"         -> Acl
---     "acl:relcl"   -> AclRelcl
---     "advck"       -> Advcl
---     "advmod"      -> Advmod
---     "amod"        -> Amod
---     "appos"       -> Appos
---     "aux"         -> Aux
---     "auxpass"     -> Auxpass
---     "case"        -> Case
---     "cc"          -> Cc
---     "cc:preconj"  -> CcPreconj
---     "ccomp"       -> Ccomp
---     "compound"    -> Compound
---     "compound:prt"-> CompoundPrt
---     "conj"        -> Conj
---     "cop"         -> Cop
---     "csubj"       -> Csubj
---     "csubjpass"   -> Csubjpass
---     "dep"         -> Dep
---     "det"         -> Det
---     "det:predet"  -> DetPredet
---     "discource"   -> Discourse
---     "discolated"  -> Discolated 
---     "dobj"        -> Dobj
---     "expl"        -> Expl
---     "fixed"       -> Fixed
---     "fixed:not"   -> FixedNot
---     "flat"        -> Flat
---     "foreign"     -> Foreign
---     "goeswith"    -> Goeswith
---     "iobj"        -> Iobj
---     "list"        -> List
---     "mark"        -> Mark
---     "neg"         -> Neg
---     "nmod"        -> Nmod
---     "nmod:npmod"  -> NmodNpmod
---     "nmod:poss"   -> NmodPoss
---     "nmod:tmod"   -> NmodTmod
---     "nsubj"       -> Nsubj
---     "nsubjpass"   -> NsubjPass
---     "nummod"      -> Nummod
---     "orphan"      -> Orphan
---     "parataxis"   -> Parataxis
---     "punct"       -> Punct
---     "reparandum"  -> Reparandum
---     "ROOT"        -> Root
---     "vocatile"    -> Vocative
---     "xcomp"       -> XComp
---     otherwise     -> UnkGer
+parseGER :: T.Text -> REL
+parseGER s =
+  case s of
+    "acl"         -> Acl
+    "acl:relcl"   -> Acl_Relcl "acl:relcl"
+    "advck"       -> Advcl
+    "advmod"      -> Advmod
+    "amod"        -> Amod
+    "appos"       -> Appos
+    "aux"         -> Aux
+    "auxpass"     -> Auxpass
+    "case"        -> Case
+    "cc"          -> Cc
+    "cc:preconj"  -> Cc_Preconj "cc:preconj"
+    "ccomp"       -> Ccomp
+    "compound"    -> Compound
+    "compound:prt"-> Compound_Pr "compound:prt"
+    "conj"        -> Conj
+    "cop"         -> Cop
+    "csubj"       -> Csubj
+    "csubjpass"   -> Csubjpass
+    "dep"         -> Dep
+    "det"         -> Det
+    "det:predet"  -> Det_Predet "det:predet" -- haskell-conll have inconsistency in naming, why use _ whee you have camelcase
+    "discource"   -> Discourse
+    "discolated"  -> Dislocated 
+    "dobj"        -> Dobj
+    "expl"        -> Expl
+    "fixed"       -> Fixed "fixed"
+    "fixed:not"   -> Fixed "fixed:not" -- haskell-conll doesn't support this one
+    "flat"        -> Flat
+    "foreign"     -> Foreign
+    "goeswith"    -> Goeswith
+    "iobj"        -> Iobj
+    "list"        -> List
+    "mark"        -> Mark
+    "neg"         -> Neg
+    "nmod"        -> Nmod
+    "nmod:npmod"  -> Nmod_npmod "nmod:npmod"
+    "nmod:poss"   -> Nmod_poss  "nmod:poss"
+    "nmod:tmod"   -> Nmod_tmod  "nmod:tmod"
+    "nsubj"       -> Nsubj
+    "nsubjpass"   -> Nsubjpass
+    "nummod"      -> Nummod
+    "orphan"      -> Orphan
+    "parataxis"   -> Parataxis
+    "punct"       -> Punct
+    "reparandum"  -> Reparandum
+    "ROOT"        -> ROOT
+    "vocatile"    -> Vocative
+    "xcomp"       -> Xcomp
+    otherwise     -> Punct -- haskell-conll doesn't support uknown type, like UnkGer, so fall back ro Punct
