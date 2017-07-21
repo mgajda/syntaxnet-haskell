@@ -29,6 +29,7 @@ library
                      , cassava
                      , containers
                      , protolude
+                     , safe
                      , split
                      , haskell-conll
   default-extensions:  OverloadedStrings

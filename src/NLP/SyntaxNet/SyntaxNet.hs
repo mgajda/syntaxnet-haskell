@@ -4,13 +4,13 @@
 
 module NLP.SyntaxNet.SyntaxNet
     ( readCnll
-    , readCnll'
+    , readParseTree
     ) where
 
 import           Control.Applicative
 import           Control.Concurrent
 import qualified Control.Exception as E
-import           Control.Lens
+import           Control.Lens hiding (at)
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Aeson
@@ -29,16 +29,19 @@ import qualified Data.Text.Encoding as TE
 import qualified Data.Text.Lazy as TL
 import qualified Data.Text.Lazy.Encoding as TEL
 import qualified Data.Vector as V
+import           Safe as S
+import           Data.String
 
 import           Data.ConllToken
 import           Data.ParsedSentence
 import           Data.SyntaxTree
 import           Data.TagLabel
 import           NLP.SyntaxNet.Types.CoNLL
+import           NLP.SyntaxNet.Types.ParseTree
 
 --------------------------------------------------------------------------------
 
-readCnll :: FilePath -> IO [SnConllToken]
+readCnll :: FilePath -> IO [SnConllToken Text]
 readCnll fpath = do 
   csvData <- BSL.readFile fpath 
   case TEL.decodeUtf8' csvData of
@@ -46,39 +49,13 @@ readCnll fpath = do
       putStrLn $ "error decoding" ++ (show err)
       return []
     Right dat  -> do
-      let decodingResult = (Csv.decodeWith cnllOptions NoHeader $ TEL.encodeUtf8 dat) :: Either String (V.Vector ConllToken)
-      case decodingResult of
+      let res = (Csv.decodeWith cnllOptions Csv.NoHeader $ TEL.encodeUtf8 dat) :: Either String (V.Vector (SnConllToken Text))
+      case res of
         Left err  -> do
           putStrLn $ "error decoding" ++ (show err)
           return [] 
         Right vals ->   
           return $ V.toList vals
-
--- | Reader for Named files with header
--- 
-readCnll' :: FilePath -> IO [SnConllToken]
-readCnll' fpath = do
-  csvData <- BSL.readFile fpath 
-  case TEL.decodeUtf8' csvData of
-    Left  err  -> do
-      putStrLn $ "error decoding" ++ (show err)
-      return []
-    Right dat  -> do
-      let dat' = dat
-      case decodeEntries $ TEL.encodeUtf8 dat' of
-        Left  err  -> do
-          putStrLn $ "error decoding" ++ (show err)
-          return []
-        Right vals -> do
-          -- TODO: do additional operations
-          return $ V.toList vals
-
-          
-decodeEntries :: BL.ByteString -> Either String (V.Vector ConllToken)
-decodeEntries = fmap snd . Csv.decodeByName
-
-decodeEntries' :: BL.ByteString -> Either String (V.Vector ConllToken)
-decodeEntries' = fmap snd . Csv.decodeByName
 
 preprocess :: TL.Text -> TL.Text
 preprocess txt = TL.cons '\"' $ TL.snoc escaped '\"'
@@ -91,16 +68,17 @@ escaper c
   | c == '\"' = "\"\""
   | otherwise = TL.singleton c
 
+
 -- | Define custom options to read tab-delimeted files
 cnllOptions =
   Csv.defaultDecodeOptions
-    { decDelimiter = fromIntegral (ord '\t')
+    { Csv.decDelimiter = fromIntegral (ord '\t')
     }
 
 --------------------------------------------------------------------------------
 -- Dealing with trees
 
-readParseTree :: FilePath -> IO (Maybe (Tree ConllToken))
+readParseTree :: FilePath -> IO (Maybe (Tree (SnConllToken Text)))
 readParseTree fpath = do
   treeData <- BSC.readFile fpath
   let ls = BSC.lines treeData
@@ -119,7 +97,7 @@ readParseTree' fpath = do
   treeData <- BSC.readFile fpath
   let ls = BSC.lines treeData
 
-  mapM_ (putStrLn . show ) ls
+  mapM_ (putStrLn . T.pack . show ) ls
 
   let lls  = map ( \x -> BSC.split ' ' x) ls
   
@@ -127,13 +105,13 @@ readParseTree' fpath = do
     
   tree <- fromList' $ lln
 
-  mapM_ (putStrLn . show ) lln
-  putStrLn "----\n"
-  putStrLn $ drawTree' $ fromJust tree
+  mapM_ (putStrLn . T.pack . show ) lln
+  putStrLn $ T.pack $ "----\n"
+  putStrLn $ T.pack $ show $ drawTree' $ fromJust tree
   
   return $ ()
   
-parseNode :: [BSC.ByteString] -> ConllToken
+parseNode :: [BSC.ByteString] -> SnConllToken Text
 parseNode llbs = do
   let llss  =  map BSC.unpack llbs
       lenLB = 3                             -- useful labels like TOKEN POS ER
@@ -144,17 +122,17 @@ parseNode llbs = do
       lbls = drop ((length lls) - 3) lls    -- extract only lables      
 
   ConllToken lvl                                 -- reuse id to indicate level, when working with trees          
-        (lbls!!0)
-        ""
-        UnkCg
-        (parsePosFg $ T.unpack $ lbls!!1)
-        ""
-        0
-        (parseGER $ T.unpack $ lbls!!2)
-        ""
-        ""
+               (lbls `at` 0)
+               ""
+               UnkCg
+               (parsePosFg $ lbls `at` 1)
+               ""
+               0
+               (parseGER $ lbls `at` 2)
+               ""
+               ""
         
-parseNode' :: BSC.ByteString -> IO ConllToken
+parseNode' :: BSC.ByteString -> IO (SnConllToken Text)
 parseNode' bs = do
   let llbs  = filter (/="|") $ BSC.split ' ' bs
       llss  = map BSC.unpack llbs
@@ -167,18 +145,18 @@ parseNode' bs = do
       lvl  = ((mod lenWP 2))+1   -- calculate actual level  
       lbls = drop ((length llt) - 3) llt    -- extract only lables
 
-  putStrLn $ show $ llss
-  putStrLn $ show $ llsf
-  putStrLn $ show $ lenWP
-  putStrLn $ show $ lvl
+  putStrLn $ T.pack $ show $ llss
+  putStrLn $ T.pack $ show $ llsf
+  putStrLn $ T.pack $ show $ lenWP
+  putStrLn $ T.pack $ show $ lvl
 
   return $ ConllToken lvl                                 -- reuse id to indicate level, when working with trees          
-                 (lbls!!0)
-                 ""
-                 UnkCg
-                 (parsePosFg $ T.unpack $ lbls!!1)
-                 ""
-                 0
-                 (parseGER $ T.unpack $ lbls!!2)
-                 ""
-                 ""
+                        (lbls `at` 0)
+                        ""
+                        UnkCg
+                        (parsePosFg $ lbls `at` 1)
+                        ""
+                        0
+                        (parseGER $ lbls `at`  2)
+                        ""
+                        ""
