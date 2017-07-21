@@ -123,7 +123,7 @@ parsePosFg s =
     "WP"  -> WP
 --    "WPS" -> WPS
     "WRB" -> WRB
---    otherwise -> UnkFg -- haskell-conll doesn't support fallback
+    otherwise -> CC -- haskell-conll doesn't support fallback
     
 parseGER :: T.Text -> REL
 parseGER s =
