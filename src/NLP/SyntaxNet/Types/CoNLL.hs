@@ -10,6 +10,7 @@ import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BSC
 import           Data.Char (toUpper, isUpper, toLower)
 import           Data.Csv as Csv
+import           Data.Maybe
 import           Data.Default
 import           Protolude
 import           Data.List.Split
@@ -104,7 +105,7 @@ parsePosFg s =
     "PDT" -> PDT
     "POS" -> POS
     "PRP" -> PRP
-    "PRP$"-> PRP_Dollar "RPR$"
+    "PRP$"-> fromJust $ fromLabelText "RPR$"
     "RB"  -> RB
     "RBR" -> RBR
     "RBS" -> RBS
@@ -128,7 +129,7 @@ parseGER :: T.Text -> REL
 parseGER s =
   case s of
     "acl"         -> Acl
-    "acl:relcl"   -> Acl_Relcl "acl:relcl"
+    "acl:relcl"   -> fromJust $ fromLabelText "acl:relcl"
     "advck"       -> Advcl
     "advmod"      -> Advmod
     "amod"        -> Amod
@@ -137,23 +138,23 @@ parseGER s =
     "auxpass"     -> Auxpass
     "case"        -> Case
     "cc"          -> Cc
-    "cc:preconj"  -> Cc_Preconj "cc:preconj"
+    "cc:preconj"  -> fromJust $ fromLabelText "cc:preconj"
     "ccomp"       -> Ccomp
     "compound"    -> Compound
-    "compound:prt"-> Compound_Pr "compound:prt"
+    "compound:prt"-> fromJust $ fromLabelText "compound:prt"
     "conj"        -> Conj
     "cop"         -> Cop
     "csubj"       -> Csubj
     "csubjpass"   -> Csubjpass
     "dep"         -> Dep
     "det"         -> Det
-    "det:predet"  -> Det_Predet "det:predet" -- haskell-conll have inconsistency in naming, why use _ whee you have camelcase
+    "det:predet"  -> fromJust $ fromLabelText "det:predet" -- haskell-conll have inconsistency in naming, why use _ whee you have camelcase
     "discource"   -> Discourse
     "discolated"  -> Dislocated 
     "dobj"        -> Dobj
     "expl"        -> Expl
-    "fixed"       -> Fixed "fixed"
-    "fixed:not"   -> Fixed "fixed:not" -- haskell-conll doesn't support this one
+    "fixed"       -> fromJust $ fromLabelText "fixed"
+    "fixed:not"   -> fromJust $ fromLabelText "fixed:not" -- haskell-conll doesn't support this one
     "flat"        -> Flat
     "foreign"     -> Foreign
     "goeswith"    -> Goeswith
@@ -162,9 +163,9 @@ parseGER s =
     "mark"        -> Mark
     "neg"         -> Neg
     "nmod"        -> Nmod
-    "nmod:npmod"  -> Nmod_npmod "nmod:npmod"
-    "nmod:poss"   -> Nmod_poss  "nmod:poss"
-    "nmod:tmod"   -> Nmod_tmod  "nmod:tmod"
+    "nmod:npmod"  -> fromJust $ fromLabelText "nmod:npmod"
+    "nmod:poss"   -> fromJust $ fromLabelText "nmod:poss"
+    "nmod:tmod"   -> fromJust $ fromLabelText "nmod:tmod"
     "nsubj"       -> Nsubj
     "nsubjpass"   -> Nsubjpass
     "nummod"      -> Nummod
