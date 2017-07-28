@@ -23,3 +23,17 @@ There are following files there for each test:
 * `.cnll` file contains the SyntaxNet output from `run.sh` script (parsed by the library)
 * `.tree` file contains the SyntaxNet output from `demo.sh` script (if present)
 
+# Usage
+
+```
+1) stack repl
+2) :load src/NLP/SyntaxNet/SyntaxNet.hs 
+3) > tr <- readParseTree "test/examples/test1.tree"
+4) > drawTree' $ fromJust $ tr
+for Testing.
+```
+
+# Acknowledgements
+
+- [Michał J. Gajda](https://github.com/mgajda)
+- [Sergey Bushnyak](https://github.com/sigrlami)

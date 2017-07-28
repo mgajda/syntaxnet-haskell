@@ -3,7 +3,7 @@ resolver: lts-8.23
 packages:
 - '.'
 - location:               
-    git: https://sigrlami:9074df1728b0cfaa9a444d8ce06b0992e3c2a47a@github.com/mgajda/haskell-conll
+    git: https://github.com/mgajda/haskell-conll
     commit: 6f68966eb298dfb811f394445191c13573e8e7ac
 
 extra-deps:
