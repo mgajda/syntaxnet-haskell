@@ -1,7 +1,7 @@
 name:                syntaxnet-haskell
 version:             0.1.1.0
--- synopsis:
--- description:
+synopsis:            Working with Google's SyntaxNet output files - CoNLL, Tree
+description:         Allows to parse SyntaxNet output files in CoNLL or Syntax Tree formats. 
 homepage:            https://github.com/mgajda/syntaxnet-haskell#readme
 license:             MIT
 license-file:        LICENSE
