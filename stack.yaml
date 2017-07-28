@@ -2,12 +2,9 @@ resolver: lts-8.23
 
 packages:
 - '.'
-- location:               
-    git: https://github.com/mgajda/haskell-conll
-    commit: 6f68966eb298dfb811f394445191c13573e8e7ac
 
 extra-deps:
-  - haskell-conll-0.1.0.0
+  - haskell-conll-0.1.0.1
 
 flags: {}
 
