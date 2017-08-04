@@ -5,6 +5,11 @@
 module NLP.SyntaxNet.SyntaxNet
     ( readCnll
     , readParseTree
+    , SnConllToken(..)
+    , Data.ConllToken.ConllToken     (..)
+    , NLP.SyntaxNet.Types.CoNLL.PosCG(..)
+    , Model.PennTreebank.POS         (..)
+    , Model.UniversalTreebank.REL    (..)
     ) where
 
 import           Control.Applicative
@@ -38,6 +43,8 @@ import           Data.SyntaxTree
 import           Data.TagLabel
 import           NLP.SyntaxNet.Types.CoNLL
 import           NLP.SyntaxNet.Types.ParseTree
+import           Model.PennTreebank     (POS(..))
+import           Model.UniversalTreebank(REL(..))
 
 --------------------------------------------------------------------------------
 
