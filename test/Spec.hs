@@ -3,6 +3,7 @@
 
 module Main (main) where
 
+import           Prelude(IO(..), Monad(..), ($), undefined)
 import           Test.Hspec
 
 --------------------------------------------------------------------------------
